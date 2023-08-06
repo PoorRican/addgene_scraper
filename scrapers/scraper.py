@@ -19,6 +19,4 @@ class BaseScraper(ABC):
         # TODO: constructors shouldn't call blocking function
         response = get(url)
         cleaned = clean_all_newlines(response.text)
-        self.soup = BeautifulSoup(cleaned)
-
-    # NOTE: there should be base scrapers for lists, and `a` tags to be reused in specific implementations
+        self.soup = BeautifulSoup(cleaned, features="html.parser")
