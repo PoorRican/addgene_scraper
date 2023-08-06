@@ -1,6 +1,8 @@
 import unittest
 from requests import get
 
+from helpers import build_url
+
 # TODO: "Tag/Fusion Protein" does not parse correctly
 EXPECTED = {
     '128041': {
@@ -25,7 +27,7 @@ EXPECTED = {
 class PlasmidPageTests(unittest.TestCase):
     def test_parse_page(self):
         for key, expected in EXPECTED:
-            response = get(build_plasmid_url(key))
+            response = get(build_url(key))
             parsed = get_plasmid(response)
             self.assertEqual(expected, parsed)  # add assertion here
 
