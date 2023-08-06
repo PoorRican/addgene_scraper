@@ -1,3 +1,7 @@
 bs4
 jupyter
 requests
+
+# these are required by openai implementation
+langchain
+openai
