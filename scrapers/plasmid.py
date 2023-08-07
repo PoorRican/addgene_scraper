@@ -1,9 +1,12 @@
-# Functor that parses a plasmid pageb
+# Functor that parses a plasmid page
 from scrapers.scraper import BaseScraper
 from helpers import build_url, get_inner_string
+import json
 
 
 class PlasmidScraper(BaseScraper):
+    data: dict
+
     def __init__(self, plasmid_id: str):
         url = build_url(plasmid_id)
         super().__init__(url)
@@ -80,4 +83,9 @@ class PlasmidScraper(BaseScraper):
         plasmid = dict()
         plasmid.update(self._scrape_details())
         plasmid.update(self._scrape_desc())
+        self.data = plasmid
         return plasmid
+
+    def save(self, path: str):
+        with open(path, 'w') as f:
+            json.dump(self.data, f)
