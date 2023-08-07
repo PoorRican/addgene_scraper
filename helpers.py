@@ -1,8 +1,10 @@
 from bs4 import Tag, NavigableString
+from urllib.parse import urljoin
 
 
 def build_url(endpoint: str) -> str:
-    return f'https://www.addgene.org/{endpoint}'
+    base = "https://www.addgene.org"
+    return urljoin(base, endpoint)
 
 
 # NOTE: these are helper functions to scrape primitive data
