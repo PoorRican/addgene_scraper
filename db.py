@@ -7,8 +7,12 @@ from datetime import datetime
 import json
 
 
-class QueryScraper:
-    """ Scrapes vector database page to fetch entire vector database """
+class DbDump:
+    """ Dump entire vector database.
+
+    The vector database is loaded client-side when rendering the vector database pages. This is
+    to reduce the load server-side. The json data is stored in the DOM as `window.results.data`
+    """
     data: dict
 
     @staticmethod
