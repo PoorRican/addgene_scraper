@@ -17,7 +17,12 @@ EXPECTED = {
         'Depositing Lab': {'value': 'Oskar Laur', 'href': '/browse/pi/4513/'},
         'Publication': {'value': 'Emory Custom Cloning Core Plasmids - Oskar Laur (unpublished)',
                         'href': '/browse/article/28203582/'},
-        'Sequence Information': {'value': [{'value': 'Sequences (1)', 'href': '/128041/sequences/'}]}
+        'Sequence Information': {'value': [{'value': 'Sequences (1)', 'href': '/128041/sequences/'}]},
+        'Article Citing this Plasmid': {'value': ['1 Reference'], 'href': '/128041/citations/'},
+        'Academic/Nonprofit Terms': {'value': ['UBMTA', 'Ancillary Agreement for Plasmids Containing FP Materials'],
+                                     'href': '/agreement/1/'},
+        'Industry Terms': {'value': ['Not Available to Industry'], 'href': None},
+
      }
 }
 
@@ -30,11 +35,11 @@ class PlasmidPageTests(unittest.TestCase):
             scraper = PlasmidScraper(plasmid_id)
             parsed = scraper.scrape()
             for key, value in expected.items():
-                self.assertTrue(parsed[key], "Scraped values did not contain {key}")
+                self.assertTrue(parsed[key], f"Scraped values did not contain {key}")
                 self.assertEqual(parsed[key], expected[key], f"Values don't match for {key}")  # add assertion here
             # also fail if key is not expected (meaning incomplete implementation)
             for key in parsed.keys():
-                self.assertTrue(key in expected.keys())
+                self.assertTrue(key in expected.keys(), f"Expected value does not contain {key}: {parsed[key]}")
 
 
 if __name__ == '__main__':
