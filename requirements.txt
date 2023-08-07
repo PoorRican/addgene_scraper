@@ -1,6 +1,7 @@
 bs4
 jupyter
 requests
+selenium
 
 # these are required by openai implementation
 langchain

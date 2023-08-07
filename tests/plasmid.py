@@ -22,7 +22,6 @@ EXPECTED = {
         'Academic/Nonprofit Terms': {'value': ['UBMTA', 'Ancillary Agreement for Plasmids Containing FP Materials'],
                                      'href': '/agreement/1/'},
         'Industry Terms': {'value': ['Not Available to Industry'], 'href': None},
-
      }
 }
 

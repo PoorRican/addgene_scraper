@@ -2,7 +2,7 @@ from bs4 import Tag, NavigableString
 
 
 def build_url(endpoint: str) -> str:
-    return f'https://www.addgene.org/{endpoint}/'
+    return f'https://www.addgene.org/{endpoint}'
 
 
 # NOTE: these are helper functions to scrape primitive data
