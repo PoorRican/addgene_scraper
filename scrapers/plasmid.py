@@ -9,7 +9,35 @@ class PlasmidScraper(BaseScraper):
         super().__init__(url)
 
     def _scrape_desc(self) -> {}:
-        return {}
+        fields = {}
+
+        raw = self.soup.find(attrs={'id': 'plasmid-description-list'})
+        for field in raw.find_all('div', attrs={'class': 'field'}):
+            label = field.find(attrs={'class': 'field-label'}).text
+
+            _content = field.find(attrs={'class': 'field-content'})
+
+            # try extracting an array
+            if _content is None:
+                element = field.find('ul')
+                if element:
+                    values = []
+                    for i in element.children:
+                        href = i.find('a').attrs['href']
+                        values.append({'value': i.text, 'href': href})
+                    fields[label] = {'value': values}
+
+            else:
+                # try extracting a link
+                a = _content.find('a')
+                if a:
+                    value = a.text
+                    href = str(a['href'])
+                else:
+                    value = _content.text
+                    href = None
+                fields[label] = {'value': value, 'href': href}
+        return fields
 
     def _scrape_details(self) -> {}:
         # get detail section
