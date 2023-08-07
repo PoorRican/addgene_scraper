@@ -26,24 +26,28 @@ class DumpClient:
         print("Beginning to dump plasmid data...\n")
         print(f"...there are {len(self.db)} records...")
 
-        for i in self.db:
-            wait = self.generate_wait()
-            print(f"Waiting {wait} seconds")
+        for i in self._plasmid_ids():
+            wait = self._generate_wait()
+            print(f"Waiting {wait} seconds before fetching {i}")
             sleep(wait)
-            _id = i['id']
-            print(f"Fetching {_id}")
-            scraper = PlasmidScraper(_id)
+            print(f"Fetching {i}")
+            scraper = PlasmidScraper(i)
             scraper.scrape()
-            scraper.save(f"plasmid_{_id}.json")
-
-    @staticmethod
-    def _get_db() -> dict:
-        return QueryScraper().scrape()
+            scraper.save(f"plasmid_{i}.json")
 
     @staticmethod
     def generate_wait() -> float:
         """ Generate a random time around 5 seconds to avoid any blanket protections """
         return normalvariate(5)
+
+    def _plasmid_ids(self):
+        """ Generator for iterating through a list of plasmid ids """
+        pattern = re.compile(r"/(\d*)/")
+        for i in self.db:
+            link = i['link']
+            matched = pattern.search(link)
+            if matched:
+                yield matched.groups()[0]
 
 
 # get entire db as json
