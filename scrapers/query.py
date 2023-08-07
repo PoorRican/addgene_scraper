@@ -24,11 +24,11 @@ class QueryScraper:
 
         return self.data
 
-    def save(self):
+    def save(self, path: str):
         """ Save current loaded data as JSON """
         if self.data is None:
             raise ValueError("Self data is None")
         else:
-            fn = f"addgene_db_{datetime.now()}.json"
+            fn = f"{path}/addgene_db_{datetime.now()}.json"
             with open(fn, 'w') as f:
                 json.dump(self.data, f)
