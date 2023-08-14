@@ -22,7 +22,19 @@ EXPECTED = {
         'Academic/Nonprofit Terms': {'value': ['UBMTA', 'Ancillary Agreement for Plasmids Containing FP Materials'],
                                      'href': '/agreement/1/'},
         'Industry Terms': {'value': ['Not Available to Industry'], 'href': None},
-     }
+     },
+    'vector-database/1403': {
+        'Plasmid': '6xHis GFP',
+        'Source/Vendor': 'Clontech',
+        'Analyze': {'value': 'Sequence', 'href': '/browse/sequence_vdb/1403/'},
+        'Plasmid Type': 'Unspecified',
+        'Cloning Method': 'Unknown',
+        'Size': '5271',
+        'GenBank': 'U89936',
+        'Stable': 'Unspecified',
+        'Constitutive': 'Unspecified',
+        'Viral/Non-Viral': 'Unspecified',
+    }
 }
 
 
@@ -34,11 +46,17 @@ class PlasmidPageTests(unittest.TestCase):
             scraper = PlasmidScraper(plasmid_id)
             parsed = scraper.scrape()
             for key, value in expected.items():
-                self.assertTrue(parsed[key], f"Scraped values did not contain {key}")
+                self.assertTrue(key in parsed, f"For {plasmid_id}, scraped values did not contain {key}")
                 self.assertEqual(parsed[key], expected[key], f"Values don't match for {key}")  # add assertion here
             # also fail if key is not expected (meaning incomplete implementation)
             for key in parsed.keys():
-                self.assertTrue(key in expected.keys(), f"Expected value does not contain {key}: {parsed[key]}")
+                self.assertTrue(key in expected.keys(), f"For {plasmid_id}, expected value does not contain {key}: {parsed[key]}")
+
+    def test_is_available(self):
+        """ test a known plasmid that is informational only """
+        link = 'vector-database/1403'
+        scraper = PlasmidScraper(link)
+        self.assertFalse(scraper._is_available())
 
 
 if __name__ == '__main__':

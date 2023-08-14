@@ -84,11 +84,38 @@ class PlasmidScraper(BaseScraper):
 
     def scrape(self) -> {}:
         plasmid = dict()
-        plasmid.update(self._scrape_details())
-        plasmid.update(self._scrape_desc())
+        if self._is_available():
+            plasmid.update(self._scrape_details())
+            plasmid.update(self._scrape_desc())
+        else:
+            plasmid = self._extract_limited()
         self.data = plasmid
         return plasmid
 
     def save(self, path: str):
         with open(path, 'w') as f:
             json.dump(self.data, f)
+
+    def _is_available(self) -> bool:
+        """ Check if current plasmid is available from AddGene.
+
+        Example: /vector-database/1403
+
+        If plasmid is not available from AddGene, there is only a limited amount of data to be extracted.
+
+        Returns
+        =======
+        false page states that plasmid is not available on AddGene,
+        otherwise, `true`
+        """
+        try:
+            main = self.soup.find(attrs={'id': 'main-content'})
+            danger = main.find(attrs={'class': 'alert-danger'})
+            # this alert-danger element should say that vector is not available on addgene
+            assert 'NOT available' in danger.text
+            return False
+        except (AttributeError, AssertionError):
+            return True
+
+    def _extract_limited(self) -> {}:
+        return {}
