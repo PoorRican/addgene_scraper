@@ -11,7 +11,6 @@ from datetime import timedelta as td
 
 
 # TODO: update function
-# TODO: check currently installed. Report remaining, continue dumping.
 class DumpClient:
     path = "addgene_dump"
     # list of already downloaded plasmids
@@ -30,7 +29,6 @@ class DumpClient:
         chdir(self.path)
 
         self.local = self._get_local()
-        # TODO: see if there are any downloaded objects to enable updating
 
     def load_db(self):
         """ Loads database file.

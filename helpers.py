@@ -9,7 +9,6 @@ def build_url(endpoint: str) -> str:
 
 # NOTE: these are helper functions to scrape primitive data
 
-# TODO: add test for primitive data
 def get_inner_string(tag: Tag) -> str:
     """ Get text enclosed by a tag, ignoring any other contained text.
     """
