@@ -92,8 +92,8 @@ class DumpClient:
 
     def _check_remaining(self) -> list:
         local = self._get_local()
-        total = [i for i in self._plasmid_ids()]
-        return list(filter(lambda x: x not in local, total))
+        total = [i for i in self.db]
+        return list(filter(lambda x: x['id'] not in local, total))
 
     def begin_dumping(self):
         print("Beginning to dump plasmid data...\n")
@@ -102,27 +102,22 @@ class DumpClient:
         print(f"...but we only have {len(remaining)} records left!")
 
         for i in remaining:
+            endpoint = i['link']
+            plasmid_id = i['id']
+
             wait = self._generate_wait()
-            print(f"Waiting {wait} seconds before fetching {i}")
+            print(f"Waiting {wait} seconds before fetching {plasmid_id}")
             sleep(wait)
-            print(f"Fetching {i}")
-            scraper = PlasmidScraper(i)
+            print(f"Fetching {plasmid_id}")
+
+            scraper = PlasmidScraper(endpoint)
             scraper.scrape()
-            scraper.save(f"plasmid_{i}.json")
+            scraper.save(f"plasmid_{plasmid_id}.json")
 
     @staticmethod
     def _generate_wait() -> float:
         """ Generate a random time around 5 seconds to avoid any blanket protections """
         return normalvariate(5)
-
-    def _plasmid_ids(self):
-        """ Generator for iterating through a list of plasmid ids """
-        pattern = re.compile(r"/(\d*)/")
-        for i in self.db:
-            link = i['link']
-            matched = pattern.search(link)
-            if matched:
-                yield matched.groups()[0]
 
     @staticmethod
     def _is_stale(latest: datetime):

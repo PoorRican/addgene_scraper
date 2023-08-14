@@ -45,6 +45,9 @@ class PlasmidScraper(BaseScraper):
     def _scrape_details(self) -> {}:
         # get detail section
         raw = self.soup.find(attrs={'id': 'detail-sections'})
+        if raw is None:
+            print(self.soup.text)
+            raise ValueError('URL did not resolve to plasmid')
         details = {}
 
         # avoid getting pricing data
