@@ -102,6 +102,8 @@ class DumpClient:
         for i in remaining:
             endpoint = i['link']
             plasmid_id = i['id']
+            if endpoint == '':
+                endpoint = f'/vector-database/{plasmid_id}'
 
             wait = self._generate_wait()
             print(f"Waiting {wait} seconds before fetching {plasmid_id}")

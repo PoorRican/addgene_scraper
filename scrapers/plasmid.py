@@ -3,7 +3,6 @@ import re
 
 from scrapers.scraper import BaseScraper
 from helpers import build_url, get_inner_string
-from bs4 import Tag
 import json
 
 
