@@ -15,6 +15,7 @@ def clean_all_newlines(raw: str) -> str:
 class BaseScraper(ABC):
     def __init__(self, url: str):
         super().__init__()
+        self.url = url
 
         # TODO: constructors shouldn't call blocking function
         response = get(url)

@@ -1,6 +1,9 @@
 # Functor that parses a plasmid page
+import re
+
 from scrapers.scraper import BaseScraper
 from helpers import build_url, get_inner_string
+from bs4 import Tag
 import json
 
 
@@ -47,7 +50,7 @@ class PlasmidScraper(BaseScraper):
         raw = self.soup.find(attrs={'id': 'detail-sections'})
         if raw is None:
             print(self.soup.text)
-            raise ValueError('URL did not resolve to plasmid')
+            raise ValueError(f'URL ({self.url}) did not resolve to plasmid')
         details = {}
 
         # avoid getting pricing data
@@ -118,4 +121,31 @@ class PlasmidScraper(BaseScraper):
             return True
 
     def _extract_limited(self) -> {}:
-        return {}
+        """ Extract data from a plasmid id that is not available from addgene.
+
+        This is called when `_is_available()` is `False`
+        """
+        data = {}
+        main = self.soup.find(attrs={'id': 'main-content'})
+
+        # get name
+        _name = main.find('h2').text
+        _pattern = re.compile('Plasmid: (.*)')
+        data['Plasmid'] = _pattern.match(_name).groups()[0]
+
+        table = main.find('table')
+        for row in table.find_all('tr'):
+            cells = row.find_all('td')
+            label = cells[0].text[:-1]      # truncate last character
+            value = cells[1]
+
+            # if value is Tag, then extract link
+            a = value.find('a')
+            if a:
+                value = {'href': a.attrs['href'], 'label': a.text}
+            else:
+                value = value.text
+
+            data[label] = value
+
+        return data

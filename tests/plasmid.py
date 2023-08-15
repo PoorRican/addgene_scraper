@@ -26,7 +26,7 @@ EXPECTED = {
     'vector-database/1403': {
         'Plasmid': '6xHis GFP',
         'Source/Vendor': 'Clontech',
-        'Analyze': {'value': 'Sequence', 'href': '/browse/sequence_vdb/1403/'},
+        'Analyze': {'label': 'Sequence', 'href': '/browse/sequence_vdb/1403/'},
         'Plasmid Type': 'Unspecified',
         'Cloning Method': 'Unknown',
         'Size': '5271',
@@ -50,7 +50,8 @@ class PlasmidPageTests(unittest.TestCase):
                 self.assertEqual(parsed[key], expected[key], f"Values don't match for {key}")  # add assertion here
             # also fail if key is not expected (meaning incomplete implementation)
             for key in parsed.keys():
-                self.assertTrue(key in expected.keys(), f"For {plasmid_id}, expected value does not contain {key}: {parsed[key]}")
+                self.assertTrue(key in expected.keys(),
+                                f"For {plasmid_id}, expected value does not contain {key}: {parsed[key]}")
 
     def test_is_available(self):
         """ test a known plasmid that is informational only """
