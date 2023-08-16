@@ -36,22 +36,26 @@ class SequenceScraperTests(unittest.TestCase):
 
     def test_get_snapgene(self):
         _, scraper = self.scrapers[0]
-        with open('files/128041.snap') as f:
+        with open('files/addgene-plasmid-128041-sequence-254994.dna', 'rb') as f:
             self.assertEqual(f.read(), scraper.get_snapgene())
 
     def test_snapgene_link(self):
         _, scraper = self.scrapers[0]
-        url = 'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/254994/508acc8c-7d0f-4ca5-9f19-6f41a8e215a1/addgene-plasmid-128041-sequence-254994.dna'
+        # this url seems like it will expire
+        url = ('https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/254994/508acc8c-7d0f-4ca5-9f19'
+               '-6f41a8e215a1/addgene-plasmid-128041-sequence-254994.dna')
         self.assertEqual(url, scraper._snapgene_link())
 
     def test_genbank_link(self):
         _, scraper = self.scrapers[0]
-        url = "https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/254994/508acc8c-7d0f-4ca5-9f19-6f41a8e215a1/addgene-plasmid-128041-sequence-254994.gbk"
+        # this url seems like it will expire
+        url = ("https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/254994/508acc8c-7d0f-4ca5-9f19"
+               "-6f41a8e215a1/addgene-plasmid-128041-sequence-254994.gbk")
         self.assertEqual(url, scraper._genbank_link())
 
     def test_get_genbank(self):
         _, scraper = self.scrapers[0]
-        with open('files/128041.gbk') as f:
+        with open('files/addgene-plasmid-128041-sequence-254994.gbk', 'rb') as f:
             self.assertEqual(f.read(), scraper.get_genbank())
 
 

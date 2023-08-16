@@ -1,6 +1,7 @@
 from bs4 import Tag
 from scrapers.scraper import BaseScraper
 from helpers import build_url, get_inner_string
+from requests import get
 
 
 class SequenceScraper(BaseScraper):
@@ -54,11 +55,13 @@ class SequenceScraper(BaseScraper):
         e = self._get_file_list()
         return _get_link_from_text(e, 'snapgene')
 
-    def get_snapgene(self) -> str:
-        return NotImplemented
+    def get_snapgene(self) -> bytes:
+        response = get(self._snapgene_link())
+        return response.content
 
-    def get_genbank(self) -> str:
-        return NotImplemented
+    def get_genbank(self) -> bytes:
+        response = get(self._genbank_link())
+        return response.content
 
 
 def _get_link_from_text(tag: Tag, text: str) -> str:
