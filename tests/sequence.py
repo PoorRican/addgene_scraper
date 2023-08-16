@@ -1,6 +1,7 @@
 import unittest
 from helpers import build_url
 from scrapers.sequence import SequenceScraper
+from bs4 import Tag
 
 EXAMPLES = (
     '/128041/sequences/#addgene-full',
@@ -24,6 +25,10 @@ class SequenceScraperTests(unittest.TestCase):
     def test_has_genbank(self):
         _, scraper = self.scrapers[0]
         self.assertTrue(scraper.has_genbank)  # add assertion here
+
+    def test_get_file_list(self):
+        _, scraper = self.scrapers[0]
+        self.assertTrue(type(scraper._get_file_list()), Tag)  # add assertion here
 
     def test_is_sequence_page(self):
         _, scraper = self.scrapers[0]
