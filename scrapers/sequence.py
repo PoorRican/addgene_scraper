@@ -16,7 +16,11 @@ class SequenceScraper(BaseScraper):
         `True` if page contains correct links
         `False` if page is incorrect
         """
-        return NotImplemented
+        for div in self.soup.find_all('div'):
+            if 'id' in div.attrs.keys():
+                if 'download-files-list' in div.attrs['id']:
+                    return True
+        return False
 
     @property
     def has_snapgene(self) -> bool:
