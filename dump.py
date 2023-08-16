@@ -1,5 +1,5 @@
 from scrapers.plasmid import PlasmidScraper
-from db import DbDump
+from db import DbFileFetcher
 from random import normalvariate
 from os import mkdir, chdir, listdir
 from typing import Union
@@ -33,13 +33,13 @@ class DumpClient:
     def load_db(self):
         """ Loads database file.
 
-        Database is loaded using `DbDump().scrape()` if a recent cached version database is unavailable.
+        Database is loaded using `DbFileFetcher().scrape()` if a recent cached version database is unavailable.
         """
         # get fn for latest local db
         latest = self._get_local_db()
         if latest is False or self._is_stale(latest[0]):
             print("Downloading current database")
-            obj = DbDump()
+            obj = DbFileFetcher()
             self.db = obj.scrape()
             obj.save('.')
             print("... database saved to disk.")

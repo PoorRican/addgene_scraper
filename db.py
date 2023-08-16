@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 
 
-class DbDump:
+class DbFileFetcher:
     """ Dump entire vector database.
 
     The vector database is loaded client-side when rendering the vector database pages. This is
