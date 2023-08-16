@@ -44,8 +44,30 @@ class SequenceScraper(BaseScraper):
     def has_genbank(self) -> bool:
         return False
 
+    def _genbank_link(self) -> str:
+        """ Return URL to download GenBank file """
+        e = self._get_file_list()
+        return _get_link_from_text(e, 'genbank')
+
+    def _snapgene_link(self) -> str:
+        """ Return URL to download SnapGene file """
+        e = self._get_file_list()
+        return _get_link_from_text(e, 'snapgene')
+
     def get_snapgene(self) -> str:
         return NotImplemented
 
     def get_genbank(self) -> str:
         return NotImplemented
+
+
+def _get_link_from_text(tag: Tag, text: str) -> str:
+    """ Get the link for an anchor element that contains the given text """
+    for a in tag.find_all('a'):
+        if text in a.text.lower():
+            if 'href' in a.attrs.keys():
+                return a.attrs['href']
+            else:
+                raise KeyError('\'a\' element has no href')
+    raise LookupError(f'No element with \'{text}\' found')
+
