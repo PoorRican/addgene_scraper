@@ -8,7 +8,7 @@ import re
 
 
 # TODO: update function
-class DumpClient:
+class DbManager:
     path = "addgene_dump"
     # list of already downloaded plasmids
     local: list
@@ -84,6 +84,6 @@ class DumpClient:
 
 # get entire db as json
 if __name__ == "__main__":
-    client = DumpClient()
+    client = DbManager()
     client.load_db()
     client.begin_dumping()
