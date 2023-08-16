@@ -1,17 +1,24 @@
 import datetime
-
+from datetime import datetime
+from datetime import timedelta as td
 from helpers import build_url
+import json
+from os import listdir
+import re
 from selenium import webdriver
 from selenium.webdriver.safari.options import Options
-from datetime import datetime
-import json
+from typing import Union
 
 
 class DbFileFetcher:
     """ Dump entire vector database.
 
-    The vector database is loaded client-side when rendering the vector database pages. This is
-    to reduce the load server-side. The json data is stored in the DOM as `window.results.data`
+    The entire AddGene database is loaded in the browser when rendering any page.
+    The database is stored in the DOM as `window.results.data`.
+
+    This class uses a webdriver from Selenium to fetch the loaded data. This process is manual and slow.
+    Therefore, functions will be provided that determine if this database is stale, and a locally, cached version will
+    be loaded when a copy of the AddGene db is needed.
     """
     data: dict
 
@@ -36,3 +43,46 @@ class DbFileFetcher:
             fn = f"{path}/addgene_db_{datetime.now()}.json"
             with open(fn, 'w') as f:
                 json.dump(self.data, f)
+
+    def load(self):
+        """ Loads database file.
+
+        Database is loaded using `DbFileFetcher().scrape()` if a recent cached version database is unavailable.
+        """
+        # get fn for latest local db
+        latest = self._get_local_db()
+        if latest is False or self._is_stale(latest[0]):
+            print("Downloading current database")
+            self.scrape()
+            self.save('.')
+            print("... database saved to disk.")
+            return self.data
+        else:
+            with open(str(latest[1]), "r") as f:
+                return json.load(f)
+
+    @staticmethod
+    def _get_local_db() -> Union[False, tuple[datetime, str]]:
+        pattern = re.compile(r"addgene_db_(.*)\.json")
+        cached = []
+        for fn in listdir('.'):
+            matched = pattern.match(fn)
+            if matched:
+                cached.append(matched.group())
+
+        if len(cached) == 0:
+            return False
+        else:
+            latest_date = datetime.fromtimestamp(0)
+            fn = None
+            for i in cached:
+                frag = pattern.match(i)
+                date = datetime.fromisoformat(frag.groups()[0])
+                if date > latest_date:
+                    latest_date = date
+                    fn = i
+            return latest_date, fn
+
+    @staticmethod
+    def _is_stale(latest: datetime):
+        return (latest - datetime.now()) > td(days=7)

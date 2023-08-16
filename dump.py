@@ -1,13 +1,10 @@
-from scrapers.plasmid import PlasmidScraper
 from db import DbFileFetcher
+from scrapers.plasmid import PlasmidScraper
 from random import normalvariate
 from os import mkdir, chdir, listdir
 from typing import Union
 from time import sleep
-import json
 import re
-from datetime import datetime
-from datetime import timedelta as td
 
 
 # TODO: update function
@@ -31,43 +28,8 @@ class DumpClient:
         self.local = self._get_local()
 
     def load_db(self):
-        """ Loads database file.
-
-        Database is loaded using `DbFileFetcher().scrape()` if a recent cached version database is unavailable.
-        """
-        # get fn for latest local db
-        latest = self._get_local_db()
-        if latest is False or self._is_stale(latest[0]):
-            print("Downloading current database")
-            obj = DbFileFetcher()
-            self.db = obj.scrape()
-            obj.save('.')
-            print("... database saved to disk.")
-        else:
-            with open(str(latest[1]), "r") as f:
-                self.db = json.load(f)
-
-    @staticmethod
-    def _get_local_db() -> Union[False, tuple[datetime, str]]:
-        pattern = re.compile(r"addgene_db_(.*)\.json")
-        cached = []
-        for fn in listdir('.'):
-            matched = pattern.match(fn)
-            if matched:
-                cached.append(matched.group())
-
-        if len(cached) == 0:
-            return False
-        else:
-            latest_date = datetime.fromtimestamp(0)
-            fn = None
-            for i in cached:
-                frag = pattern.match(i)
-                date = datetime.fromisoformat(frag.groups()[0])
-                if date > latest_date:
-                    latest_date = date
-                    fn = i
-            return latest_date, fn
+        fetcher = DbFileFetcher()
+        self.db = fetcher.load()
 
     @staticmethod
     def _get_local() -> list:
@@ -118,10 +80,6 @@ class DumpClient:
     def _generate_wait() -> float:
         """ Generate a random time around 5 seconds to avoid any blanket protections """
         return normalvariate(5)
-
-    @staticmethod
-    def _is_stale(latest: datetime):
-        return (latest - datetime.now()) > td(days=7)
 
 
 # get entire db as json
