@@ -39,11 +39,19 @@ class SequenceScraper(BaseScraper):
 
     @property
     def has_snapgene(self) -> bool:
-        return False
+        try:
+            self._snapgene_link()
+            return True
+        except ValueError:
+            return False
 
     @property
     def has_genbank(self) -> bool:
-        return False
+        try:
+            self._genbank_link()
+            return True
+        except ValueError:
+            return False
 
     def _genbank_link(self) -> str:
         """ Return URL to download GenBank file """
@@ -71,6 +79,6 @@ def _get_link_from_text(tag: Tag, text: str) -> str:
             if 'href' in a.attrs.keys():
                 return a.attrs['href']
             else:
-                raise KeyError('\'a\' element has no href')
-    raise LookupError(f'No element with \'{text}\' found')
+                raise ValueError('\'a\' element has no href')
+    raise ValueError(f'No element with \'{text}\' found')
 
