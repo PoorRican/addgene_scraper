@@ -71,6 +71,10 @@ class SequenceScraper(BaseScraper):
         response = get(self._genbank_link())
         return response.content
 
+    def available_sequences(self) -> list:
+        """ Show available sequences for given plasmid """
+        return []
+
 
 def _get_link_from_text(tag: Tag, text: str) -> str:
     """ Get the link for an anchor element that contains the given text """

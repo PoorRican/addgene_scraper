@@ -34,6 +34,10 @@ class SequenceScraperTests(unittest.TestCase):
         _, scraper = self.scrapers[0]
         self.assertTrue(scraper._is_sequence_page())  # add assertion here
 
+    def test_available_sequences(self):
+        _, scraper = self.scrapers[0]
+        self.assertEqual(['full'], scraper.available_sequences())
+
     def test_get_snapgene(self):
         _, scraper = self.scrapers[0]
         with open('files/addgene-plasmid-128041-sequence-254994.dna', 'rb') as f:
