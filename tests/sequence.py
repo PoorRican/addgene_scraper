@@ -1,10 +1,17 @@
 import unittest
 from helpers import build_url
 from scrapers.sequence import SequenceScraper
+from scrapers.sequence import SequenceType
 from bs4 import Tag
 
 EXAMPLES = (
-    '/128041/sequences/#addgene-full',
+    '/128041/sequences/',
+    '/45789/sequences/'
+)
+
+SEQUENCE_AVAILABILITIES = (
+    [SequenceType.ADDGENE_FULL],
+    [SequenceType.DEPOSITOR_FULL, SequenceType.ADDGENE_PARTIAL]
 )
 
 
@@ -35,8 +42,9 @@ class SequenceScraperTests(unittest.TestCase):
         self.assertTrue(scraper._is_sequence_page())  # add assertion here
 
     def test_available_sequences(self):
-        _, scraper = self.scrapers[0]
-        self.assertEqual(['full'], scraper.available_sequences())
+        scrapers = [i for _, i in self.scrapers]
+        for scraper, expected in zip(scrapers, SEQUENCE_AVAILABILITIES):
+            self.assertEqual(scraper.available_sequences(), expected)
 
     def test_get_snapgene(self):
         _, scraper = self.scrapers[0]

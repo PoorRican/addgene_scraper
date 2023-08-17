@@ -1,7 +1,16 @@
 from bs4 import Tag
-from scrapers.scraper import BaseScraper
-from helpers import build_url, get_inner_string
+from enum import Enum
+from helpers import build_url
 from requests import get
+from scrapers.scraper import BaseScraper
+from typing import List
+
+
+class SequenceType(Enum):
+    ADDGENE_FULL = 'addgene_full'
+    ADDGENE_PARTIAL = 'addgene_partial'
+    DEPOSITOR_FULL = 'depositor_full'
+    DEPOSITOR_PARTIAL = 'depositor_partial'
 
 
 class SequenceScraper(BaseScraper):
@@ -71,9 +80,26 @@ class SequenceScraper(BaseScraper):
         response = get(self._genbank_link())
         return response.content
 
-    def available_sequences(self) -> list:
-        """ Show available sequences for given plasmid """
-        return []
+    def available_sequences(self) -> List[SequenceType]:
+        """ Show available sequence types for given plasmid
+
+        Although some plasmids may have more than one partial sequence, only one `SequenceType` is returned
+        regardless of the amount of sequences. For example [this plasmid](https://www.addgene.org/45789/sequences/)
+        has one full sequence from depositor and 5 partial sequences by AddGene. However, only `[ADDGENE_PARTIAL,
+        DEPOSITOR_FULL]` is returned.
+        """
+        available = []
+        terms = [
+            ('depositor-full', SequenceType.DEPOSITOR_FULL),
+            ('depositor-partial', SequenceType.DEPOSITOR_PARTIAL),
+            ('addgene-full', SequenceType.ADDGENE_FULL),
+            ('addgene-partial', SequenceType.ADDGENE_PARTIAL),
+        ]
+        for _id, _type in terms:
+            element = self.soup.find('section', attrs={'id': _id})
+            if element is not None:
+                available.append(_type)
+        return available
 
 
 def _get_link_from_text(tag: Tag, text: str) -> str:
