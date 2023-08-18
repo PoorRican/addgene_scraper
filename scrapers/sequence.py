@@ -32,28 +32,9 @@ class SequenceScraper(BaseScraper):
         `True` if page contains correct links
         `False` if page is incorrect
         """
-        if self._get_files_list(self.soup) is not None:
+        if _get_files_list(self.soup) is not None:
             return True
         return False
-
-    @staticmethod
-    def _get_files_list(root: Tag) -> Iterator[Tag]:
-        """ Get file list element.
-
-        Returns
-        `Tag` with file list element if page has sequence data
-
-        Raises
-        `ValueError` when downloaded page does not contain 'download-files-list' element
-        """
-        divs = root.find_all('div')
-        if divs is None:
-            raise ValueError('HTML does not contain \'download-files-list\' element')
-
-        for div in divs:
-            if 'id' in div.attrs.keys():
-                if 'download-files-list' in div.attrs['id']:
-                    yield div
 
     def best_sequence(self, filetype: FileType) -> str:
         """ Get the link to the best available sequence.
@@ -91,17 +72,17 @@ class SequenceScraper(BaseScraper):
             if _type is SequenceType.DEPOSITOR_FULL or _type is SequenceType.ADDGENE_FULL:
                 sections[_type] = section
 
-        # extract links from sections
-        links = {}
-        for _type, section in sections.items():
-            _section_links = []
-            sequences = self._get_files_list(section)
-            for sequence in sequences:
-                _link = _get_link_from_text(sequence, filetype.value)
-                _section_links.append(_link)
-            links[_type] = _section_links
+        return _extract_links_from_sections(sections, filetype)
 
-        return links
+    def _partial_links(self, filetype: FileType) -> Mapping[SequenceType, List[str]]:
+        # partition HTML sections for full sequences
+        # each section represents sequence type. More than one link may be extracted.
+        sections = {}
+        for _type, section in self._sequence_sections():
+            if _type is SequenceType.DEPOSITOR_PARTIAL or _type is SequenceType.ADDGENE_PARTIAL:
+                sections[_type] = section
+
+        return _extract_links_from_sections(sections, filetype)
 
     def _sequence_sections(self) -> Iterator[Tuple[SequenceType, Tag]]:
         terms = [
@@ -145,3 +126,35 @@ def _get_link_from_text(tag: Tag, text: str) -> str:
             else:
                 raise ValueError('\'a\' element has no href')
     raise ValueError(f'No element with \'{text}\' found')
+
+
+def _get_files_list(root: Tag) -> Iterator[Tag]:
+    """ Get file list element.
+
+    Returns
+    `Tag` with file list element if page has sequence data
+
+    Raises
+    `ValueError` when downloaded page does not contain 'download-files-list' element
+    """
+    divs = root.find_all('div')
+    if divs is None:
+        raise ValueError('HTML does not contain \'download-files-list\' element')
+
+    for div in divs:
+        if 'id' in div.attrs.keys():
+            if 'download-files-list' in div.attrs['id']:
+                yield div
+
+
+def _extract_links_from_sections(sections: Mapping[SequenceType, Tag], filetype: FileType):
+    links = {}
+    for _type, section in sections.items():
+        _section_links = []
+        sequences = _get_files_list(section)
+        for sequence in sequences:
+            _link = _get_link_from_text(sequence, filetype.value)
+            _section_links.append(_link)
+        links[_type] = _section_links
+
+    return links
