@@ -94,6 +94,12 @@ class SequenceScraperTests(unittest.TestCase):
         for link, scraper in zip(EXAMPLES, self.scrapers):
             self.assertEqual(scraper.url, build_url(link))
 
+    def test_best_sequence(self):
+        for scraper, expected in zip(self.scrapers, FULL_GENBANK_LINKS):
+            self.assertEqual([i for i in expected.values()][0][0], scraper.best_sequence(FileType.GENBANK))
+        for scraper, expected in zip(self.scrapers, FULL_SNAPGENE_LINKS):
+            self.assertEqual([i for i in expected.values()][0][0], scraper.best_sequence(FileType.SNAPGENE))
+
     def test_has_full_sequence(self):
         for scraper in self.scrapers:
             self.assertTrue(scraper._has_full_sequence())

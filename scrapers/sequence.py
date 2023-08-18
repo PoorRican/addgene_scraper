@@ -55,6 +55,22 @@ class SequenceScraper(BaseScraper):
                 if 'download-files-list' in div.attrs['id']:
                     yield div
 
+    def best_sequence(self, filetype: FileType) -> str:
+        """ Get the link to the best available sequence.
+
+        Returns
+        The best available full sequence is returned. The depositor's full sequence takes priority over AddGene's
+        sequences.
+
+        Raises
+        If there are no full sequences available, an error is returned.
+        """
+        links = self._full_links(filetype)
+        for sequence in (SequenceType.DEPOSITOR_FULL, SequenceType.ADDGENE_FULL):
+            if sequence in links.keys():
+                # there is usually only one full sequence, so return the first available
+                return links[sequence][0]
+
     def _has_full_sequence(self) -> bool:
         """ Check to see if there is a full sequence available.
 
