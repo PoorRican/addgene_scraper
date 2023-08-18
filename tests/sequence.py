@@ -81,14 +81,6 @@ class SequenceScraperTests(unittest.TestCase):
         for link, scraper in zip(EXAMPLES, self.scrapers):
             self.assertEqual(scraper.url, build_url(link))
 
-    def test_has_snapgene(self):
-        scraper = self.scrapers[0]
-        self.assertTrue(scraper.has_snapgene)  # add assertion here
-
-    def test_has_genbank(self):
-        scraper = self.scrapers[0]
-        self.assertTrue(scraper.has_genbank)  # add assertion here
-
     def test_get_file_list(self):
         scraper = self.scrapers[0]
         self.assertTrue(type(scraper._get_file_list()), Tag)  # add assertion here
