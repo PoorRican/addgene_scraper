@@ -1,9 +1,8 @@
 from bs4 import Tag
 from enum import Enum
 from helpers import build_url
-from requests import get
 from scrapers.scraper import BaseScraper
-from typing import List
+from typing import List, Iterator, Tuple
 
 
 class SequenceType(Enum):
@@ -45,40 +44,6 @@ class SequenceScraper(BaseScraper):
                 if 'download-files-list' in div.attrs['id']:
                     return div
         raise ValueError('HTML does not contain \'download-files-list\' element')
-
-    @property
-    def has_snapgene(self) -> bool:
-        try:
-            self._snapgene_link()
-            return True
-        except ValueError:
-            return False
-
-    @property
-    def has_genbank(self) -> bool:
-        try:
-            self._genbank_link()
-            return True
-        except ValueError:
-            return False
-
-    def _genbank_link(self) -> str:
-        """ Return URL to download GenBank file """
-        e = self._get_file_list()
-        return _get_link_from_text(e, 'genbank')
-
-    def _snapgene_link(self) -> str:
-        """ Return URL to download SnapGene file """
-        e = self._get_file_list()
-        return _get_link_from_text(e, 'snapgene')
-
-    def get_snapgene(self) -> bytes:
-        response = get(self._snapgene_link())
-        return response.content
-
-    def get_genbank(self) -> bytes:
-        response = get(self._genbank_link())
-        return response.content
 
     def _sequence_sections(self) -> Iterator[Tuple[SequenceType, Tag]]:
         terms = [

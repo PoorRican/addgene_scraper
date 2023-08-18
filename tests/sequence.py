@@ -93,24 +93,6 @@ class SequenceScraperTests(unittest.TestCase):
         for scraper, expected in zip(self.scrapers, SEQUENCE_AVAILABILITIES):
             self.assertEqual(scraper.available_sequences(), expected)
 
-    def test_get_snapgene(self):
-        scraper = self.scrapers[0]
-        with open('files/addgene-plasmid-128041-sequence-254994.dna', 'rb') as f:
-            self.assertEqual(f.read(), scraper.get_snapgene())
-
-    def test_snapgene_link(self):
-        for scraper, expected in zip(self.scrapers, SNAPGENE_SEQUENCE_LINKS):
-            self.assertEqual(expected, scraper._snapgene_link())
-
-    def test_genbank_link(self):
-        for scraper, expected in zip(self.scrapers, GENBANK_SEQUENCE_LINKS):
-            self.assertEqual(expected, scraper._genbank_link())
-
-    def test_get_genbank(self):
-        scraper = self.scrapers[0]
-        with open('files/addgene-plasmid-128041-sequence-254994.gbk', 'rb') as f:
-            self.assertEqual(f.read(), scraper.get_genbank())
-
 
 if __name__ == '__main__':
     unittest.main()
