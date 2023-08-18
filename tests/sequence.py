@@ -99,6 +99,8 @@ class SequenceScraperTests(unittest.TestCase):
         for scraper, expected in zip(self.scrapers, FULL_SNAPGENE_LINKS):
             self.assertEqual([i for i in expected.values()][0][0], scraper.best_sequence(FileType.SNAPGENE))
 
+        # TODO: assert that partial sequences are returned if there are no full sequences available
+
     def test_has_full_sequence(self):
         for scraper in self.scrapers:
             self.assertTrue(scraper._has_full_sequence())
