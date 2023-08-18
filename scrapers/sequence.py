@@ -1,6 +1,7 @@
 from bs4 import Tag
 from enum import Enum
 from helpers import build_url
+from requests import get
 from scrapers.scraper import BaseScraper
 from typing import List, Iterator, Tuple, Mapping
 
@@ -35,6 +36,18 @@ class SequenceScraper(BaseScraper):
         if _get_files_list(self.soup) is not None:
             return True
         return False
+
+    def get_best(self, filetype: FileType) -> bytes:
+        """ Get best available sequence
+
+        Returns
+        The best available SnapGene or Genbank file is returned.
+
+        See Also
+        [`SequenceScraper.best_sequence`]
+        """
+        response = get(self.best_sequence(filetype))
+        return response.content
 
     def best_sequence(self, filetype: FileType) -> str:
         """ Get the link to the best available sequence.
