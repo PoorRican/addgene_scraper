@@ -1,6 +1,6 @@
 import unittest
 from helpers import build_url
-from scrapers.sequence import SequenceScraper
+from scrapers.sequence import SequenceScraper, FileType
 from scrapers.sequence import SequenceType
 from typing import ClassVar, List
 from bs4 import Tag
@@ -16,7 +16,7 @@ SEQUENCE_AVAILABILITIES = (
 )
 
 # these urls seem like they will eventually become invalid
-SNAPGENE_SEQUENCE_LINKS = (
+FULL_SNAPGENE_LINKS = (
     {
         SequenceType.ADDGENE_FULL: [
             'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/254994/508acc8c-7d0f-4ca5-9f19'
@@ -28,6 +28,12 @@ SNAPGENE_SEQUENCE_LINKS = (
             'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/108431/2caf23fb-5f75-4a9a-9650'
             '-495f56119387/addgene-plasmid-45789-sequence-108431.dna',
         ],
+    }
+)
+
+PARTIAL_SNAPGENE_LINKS = (
+    {},
+    {
         SequenceType.ADDGENE_PARTIAL: [
             'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/67198/6d25587f-25a6-4830-a6c5'
             '-ae2865247e8a/addgene-plasmid-45789-sequence-67198.dna',
@@ -42,7 +48,8 @@ SNAPGENE_SEQUENCE_LINKS = (
         ]
     }
 )
-GENBANK_SEQUENCE_LINKS = (
+
+FULL_GENBANK_LINKS = (
     {
         SequenceType.ADDGENE_FULL: [
             'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/254994/508acc8c-7d0f-4ca5-9f19'
@@ -54,6 +61,12 @@ GENBANK_SEQUENCE_LINKS = (
             'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/108431/2caf23fb-5f75-4a9a-9650'
             '-495f56119387/addgene-plasmid-45789-sequence-108431.gbk',
         ],
+    }
+)
+
+PARTIAL_GENBANK_LINKS = (
+    {},
+    {
         SequenceType.ADDGENE_PARTIAL: [
             'https://media.addgene.org/snapgene-media/v1.7.9-0-g88a3305/sequences/67198/6d25587f-25a6-4830-a6c5'
             '-ae2865247e8a/addgene-plasmid-45789-sequence-67198.gbk',
@@ -81,9 +94,14 @@ class SequenceScraperTests(unittest.TestCase):
         for link, scraper in zip(EXAMPLES, self.scrapers):
             self.assertEqual(scraper.url, build_url(link))
 
-    def test_get_file_list(self):
-        scraper = self.scrapers[0]
-        self.assertTrue(type(scraper._get_file_list()), Tag)  # add assertion here
+    def test_full_links(self):
+        # test genbank
+        for scraper, expected in zip(self.scrapers, FULL_GENBANK_LINKS):
+            self.assertEqual(scraper._full_links(FileType.GENBANK), expected)
+
+        # test snapgene
+        for scraper, expected in zip(self.scrapers, FULL_SNAPGENE_LINKS):
+            self.assertEqual(scraper._full_links(FileType.SNAPGENE), expected)
 
     def test_is_sequence_page(self):
         scraper = self.scrapers[0]

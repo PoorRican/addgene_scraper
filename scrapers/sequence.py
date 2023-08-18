@@ -2,7 +2,13 @@ from bs4 import Tag
 from enum import Enum
 from helpers import build_url
 from scrapers.scraper import BaseScraper
-from typing import List, Iterator, Tuple
+from typing import List, Iterator, Tuple, Mapping
+
+
+class FileType(Enum):
+    """ Represents available sequence filetypes """
+    SNAPGENE = 'snapgene'
+    GENBANK = 'genbank'
 
 
 class SequenceType(Enum):
@@ -26,11 +32,12 @@ class SequenceScraper(BaseScraper):
         `True` if page contains correct links
         `False` if page is incorrect
         """
-        if self._get_file_list() is not None:
+        if self._get_files_list(self.soup) is not None:
             return True
         return False
 
-    def _get_file_list(self) -> Tag:
+    @staticmethod
+    def _get_files_list(root: Tag) -> Iterator[Tag]:
         """ Get file list element.
 
         Returns
@@ -39,11 +46,34 @@ class SequenceScraper(BaseScraper):
         Raises
         `ValueError` when downloaded page does not contain 'download-files-list' element
         """
-        for div in self.soup.find_all('div'):
+        divs = root.find_all('div')
+        if divs is None:
+            raise ValueError('HTML does not contain \'download-files-list\' element')
+
+        for div in divs:
             if 'id' in div.attrs.keys():
                 if 'download-files-list' in div.attrs['id']:
-                    return div
-        raise ValueError('HTML does not contain \'download-files-list\' element')
+                    yield div
+
+    def _full_links(self, filetype: FileType) -> Mapping[SequenceType, List[str]]:
+        # partition HTML sections for full sequences
+        # each section represents sequence type. More than one link may be extracted.
+        sections = {}
+        for _type, section in self._sequence_sections():
+            if _type is SequenceType.DEPOSITOR_FULL or _type is SequenceType.ADDGENE_FULL:
+                sections[_type] = section
+
+        # extract links from sections
+        links = {}
+        for _type, section in sections.items():
+            _section_links = []
+            sequences = self._get_files_list(section)
+            for sequence in sequences:
+                _link = _get_link_from_text(sequence, filetype.value)
+                _section_links.append(_link)
+            links[_type] = _section_links
+
+        return links
 
     def _sequence_sections(self) -> Iterator[Tuple[SequenceType, Tag]]:
         terms = [
@@ -73,7 +103,13 @@ class SequenceScraper(BaseScraper):
 
 
 def _get_link_from_text(tag: Tag, text: str) -> str:
-    """ Get the link for an anchor element that contains the given text """
+    """ Get the link for an anchor element that contains the given text
+
+    Example:
+        tag = "<div><a href="example.com">first</a><a href="testing.com">second</'a>"
+        assert _get_link_from_text(tag, 'first') == 'example.com'
+        assert _get_link_from_text(tag, 'second') == 'testing.com'
+    """
     for a in tag.find_all('a'):
         if text in a.text.lower():
             if 'href' in a.attrs.keys():
@@ -81,4 +117,3 @@ def _get_link_from_text(tag: Tag, text: str) -> str:
             else:
                 raise ValueError('\'a\' element has no href')
     raise ValueError(f'No element with \'{text}\' found')
-
