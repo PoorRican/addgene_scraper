@@ -112,6 +112,15 @@ class SequenceScraperTests(unittest.TestCase):
         for scraper, expected in zip(self.scrapers, FULL_SNAPGENE_LINKS):
             self.assertEqual(scraper._full_links(FileType.SNAPGENE), expected)
 
+    def test_partial_links(self):
+        # test genbank
+        for scraper, expected in zip(self.scrapers, PARTIAL_GENBANK_LINKS):
+            self.assertEqual(scraper._partial_links(FileType.GENBANK), expected)
+
+        # test snapgene
+        for scraper, expected in zip(self.scrapers, PARTIAL_SNAPGENE_LINKS):
+            self.assertEqual(scraper._partial_links(FileType.SNAPGENE), expected)
+
     def test_is_sequence_page(self):
         scraper = self.scrapers[0]
         self.assertTrue(scraper._is_sequence_page())  # add assertion here
