@@ -53,7 +53,9 @@ class SequenceScraper(BaseScraper):
             ('addgene-partial', SequenceType.ADDGENE_PARTIAL),
         ]
         for _id, _type in terms:
-            yield _type, self.soup.find('section', attrs={'id': _id})
+            element = self.soup.find('section', attrs={'id': _id})
+            if element is not None:
+                yield _type, element
 
     def available_sequences(self) -> List[SequenceType]:
         """ Show available sequence types for given plasmid
