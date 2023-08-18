@@ -52,18 +52,29 @@ class SequenceScraper(BaseScraper):
     def best_sequence(self, filetype: FileType) -> str:
         """ Get the link to the best available sequence.
 
-        Returns
-        The best available full sequence is returned. The depositor's full sequence takes priority over AddGene's
-        sequences.
+        This is the priority of sequence types:
+        - depositor's full sequence
+        - AddGene's full sequence
+        - depositor's partial sequence
+        - AddGene's partial sequence
 
-        Raises
-        If there are no full sequences available, an error is returned.
+        The first sequence of any type is returned
+
+        Returns
+        The best available sequence is returned
         """
-        links = self._full_links(filetype)
-        for sequence in (SequenceType.DEPOSITOR_FULL, SequenceType.ADDGENE_FULL):
-            if sequence in links.keys():
-                # there is usually only one full sequence, so return the first available
-                return links[sequence][0]
+        if self._has_full_sequence():
+            links = self._full_links(filetype)
+            for sequence in (SequenceType.DEPOSITOR_FULL, SequenceType.ADDGENE_FULL):
+                if sequence in links.keys():
+                    # there is usually only one full sequence, but it is still wrapped in an array
+                    return links[sequence][0]
+        else:
+            links = self._partial_links(filetype)
+            for sequence in (SequenceType.DEPOSITOR_PARTIAL, SequenceType.ADDGENE_PARTIAL):
+                if sequence in links.keys():
+                    # return the first available partial sequence
+                    return links[sequence][0]
 
     def _has_full_sequence(self) -> bool:
         """ Check to see if there is a full sequence available.
