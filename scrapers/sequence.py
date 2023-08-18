@@ -80,6 +80,16 @@ class SequenceScraper(BaseScraper):
         response = get(self._genbank_link())
         return response.content
 
+    def _sequence_sections(self) -> Iterator[Tuple[SequenceType, Tag]]:
+        terms = [
+            ('depositor-full', SequenceType.DEPOSITOR_FULL),
+            ('addgene-full', SequenceType.ADDGENE_FULL),
+            ('depositor-partial', SequenceType.DEPOSITOR_PARTIAL),
+            ('addgene-partial', SequenceType.ADDGENE_PARTIAL),
+        ]
+        for _id, _type in terms:
+            yield _type, self.soup.find('section', attrs={'id': _id})
+
     def available_sequences(self) -> List[SequenceType]:
         """ Show available sequence types for given plasmid
 
@@ -89,14 +99,7 @@ class SequenceScraper(BaseScraper):
         DEPOSITOR_FULL]` is returned.
         """
         available = []
-        terms = [
-            ('depositor-full', SequenceType.DEPOSITOR_FULL),
-            ('depositor-partial', SequenceType.DEPOSITOR_PARTIAL),
-            ('addgene-full', SequenceType.ADDGENE_FULL),
-            ('addgene-partial', SequenceType.ADDGENE_PARTIAL),
-        ]
-        for _id, _type in terms:
-            element = self.soup.find('section', attrs={'id': _id})
+        for _type, element in self._sequence_sections():
             if element is not None:
                 available.append(_type)
         return available
