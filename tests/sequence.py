@@ -3,7 +3,6 @@ from helpers import build_url
 from scrapers.sequence import SequenceScraper, FileType
 from scrapers.sequence import SequenceType
 from typing import ClassVar, List
-from bs4 import Tag
 
 EXAMPLES = (
     '/128041/sequences/',
