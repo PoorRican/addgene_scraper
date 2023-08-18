@@ -55,6 +55,18 @@ class SequenceScraper(BaseScraper):
                 if 'download-files-list' in div.attrs['id']:
                     yield div
 
+    def _has_full_sequence(self) -> bool:
+        """ Check to see if there is a full sequence available.
+
+        Returns
+        `True` if there are full sequences available
+        `False` if there are no full sequences available
+        """
+        # checking both for assurance
+        if self._full_links(FileType.GENBANK) == {} and self._full_links(FileType.SNAPGENE) == {}:
+            return False
+        return True
+
     def _full_links(self, filetype: FileType) -> Mapping[SequenceType, List[str]]:
         # partition HTML sections for full sequences
         # each section represents sequence type. More than one link may be extracted.
