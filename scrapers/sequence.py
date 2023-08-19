@@ -33,7 +33,7 @@ class SequenceScraper(BaseScraper):
         `True` if page contains correct links
         `False` if page is incorrect
         """
-        if _get_files_list(self.soup) is not None:
+        if [i for i in _get_files_list(self.soup)]:
             return True
         return False
 
@@ -162,8 +162,6 @@ def _get_files_list(root: Tag) -> Iterator[Tag]:
     `ValueError` when downloaded page does not contain 'download-files-list' element
     """
     divs = root.find_all('div')
-    if divs is None:
-        raise ValueError('HTML does not contain \'download-files-list\' element')
 
     for div in divs:
         if 'id' in div.attrs.keys():
